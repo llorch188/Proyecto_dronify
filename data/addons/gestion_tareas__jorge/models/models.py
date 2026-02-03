@@ -3,11 +3,7 @@ from datetime import timedelta
 from odoo.exceptions import UserError
 import logging
 
-# =================================================
-# LOGGER
-# =================================================
 _logger = logging.getLogger(__name__)
-
 
 # =================================================
 # MODELO: TAREA
@@ -17,10 +13,21 @@ class GestionTarea(models.Model):
     _description = 'Gestión de tareas'
 
     name = fields.Char(string="Título de la tarea")
+
     description = fields.Text(
         string="Descripción",
-        required=True,
-        help="La descripción es obligatoria"
+        required=True
+    )
+
+    fecha_inicio = fields.Date(
+        string="Fecha inicio",
+        required=True
+    )
+
+    fecha_fin = fields.Date(
+        string="Fecha fin",
+        compute="_compute_fecha_fin",
+        store=True
     )
 
     historia_id = fields.Many2one(
@@ -31,73 +38,51 @@ class GestionTarea(models.Model):
 
     tecnologia_ids = fields.Many2many(
         'gestion_tareas__jorge.tecnologia',
-        relation='relacion_tarea_tecnologia',
-        column1='tarea_id',
-        column2='tecnologia_id',
+        'rel_tarea_tecnologia',
+        'tarea_id',
+        'tecnologia_id',
         string="Tecnologías"
     )
 
-    # =================================================
-    # EXCEPCIONES + LOGS (CREATE)
-    # =================================================
+    @api.depends('fecha_inicio')
+    def _compute_fecha_fin(self):
+        for record in self:
+            record.fecha_fin = (
+                record.fecha_inicio + timedelta(days=7)
+                if record.fecha_inicio else False
+            )
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             if not vals.get('description'):
-                _logger.error("Intento de crear tarea sin descripción")
                 raise UserError("La descripción de la tarea es obligatoria.")
-
-            _logger.info(
-                "Creando tarea: %s",
-                vals.get('name', 'Sin título')
-            )
-
         return super().create(vals_list)
 
-    # =================================================
-    # EXCEPCIONES + LOGS (WRITE)
-    # =================================================
     def write(self, vals):
         if 'description' in vals and not vals.get('description'):
-            _logger.error("Intento de dejar una tarea sin descripción")
             raise UserError("La descripción no puede quedar vacía.")
-
-        _logger.info(
-            "Modificando tarea ID(s) %s con valores %s",
-            self.ids,
-            vals
-        )
-
         return super().write(vals)
 
 
 # =================================================
-# MODELO: HISTORIA DE USUARIO
+# MODELO: HISTORIA
 # =================================================
 class GestionHistoria(models.Model):
     _name = 'gestion_tareas__jorge.historia'
     _description = 'Historia de usuario'
 
-    name = fields.Char(
-        string="Nombre de la historia",
-        required=True
-    )
-
-    description = fields.Text(
-        string="Descripción",
-        required=True
-    )
+    name = fields.Char(required=True)
+    description = fields.Text(required=True)
 
     proyecto_id = fields.Many2one(
         'gestion_tareas__jorge.proyecto',
-        string='Proyecto',
         ondelete='cascade'
     )
 
     tarea_ids = fields.One2many(
         'gestion_tareas__jorge.tarea',
-        'historia_id',
-        string='Tareas'
+        'historia_id'
     )
 
 
@@ -108,20 +93,12 @@ class GestionProyecto(models.Model):
     _name = 'gestion_tareas__jorge.proyecto'
     _description = 'Proyecto'
 
-    name = fields.Char(
-        string="Nombre del proyecto",
-        required=True
-    )
-
-    description = fields.Text(
-        string="Descripción",
-        required=True
-    )
+    name = fields.Char(required=True)
+    description = fields.Text(required=True)
 
     historia_ids = fields.One2many(
         'gestion_tareas__jorge.historia',
-        'proyecto_id',
-        string='Historias del proyecto'
+        'proyecto_id'
     )
 
 
@@ -132,9 +109,29 @@ class GestionTecnologia(models.Model):
     _name = 'gestion_tareas__jorge.tecnologia'
     _description = 'Tecnología'
 
-    name = fields.Char(
-        string="Nombre de la tecnología",
-        required=True
+    name = fields.Char(required=True)
+
+    desarrollador_ids = fields.Many2many(
+        'res.partner',
+        'rel_dev_tec',
+        'tecnologia_id',
+        'desarrollador_id',
+        string="Desarrolladores"
+    )
+
+
+# =================================================
+# HERENCIA: DESARROLLADORES (res.partner)
+# =================================================
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    tecnologia_ids = fields.Many2many(
+        'gestion_tareas__jorge.tecnologia',
+        'rel_dev_tec',
+        'desarrollador_id',
+        'tecnologia_id',
+        string="Tecnologías"
     )
 
 
@@ -145,41 +142,24 @@ class GestionSprint(models.Model):
     _name = 'gestion_tareas__jorge.sprint'
     _description = 'Sprint del proyecto'
 
-    nombre = fields.Char(
-        string="Nombre",
-        required=True
-    )
-
-    fecha_ini = fields.Datetime(
-        string="Fecha inicio",
-        required=True
-    )
-
-    duracion = fields.Integer(
-        string="Duración (días)",
-        help="Cantidad de días que dura el sprint"
-    )
+    nombre = fields.Char(required=True)
+    fecha_ini = fields.Datetime(required=True)
+    duracion = fields.Integer()
 
     fecha_fin = fields.Datetime(
         compute='_compute_fecha_fin',
-        store=True,
-        string="Fecha fin"
+        store=True
     )
 
     proyecto_id = fields.Many2one(
         'gestion_tareas__jorge.proyecto',
-        string='Proyecto',
         ondelete='set null'
     )
 
-    # =================================================
-    # COMPUTE
-    # =================================================
     @api.depends('fecha_ini', 'duracion')
     def _compute_fecha_fin(self):
         for record in self:
-            if record.fecha_ini and record.duracion:
-                record.fecha_fin = record.fecha_ini + timedelta(days=record.duracion)
-            else:
-                record.fecha_fin = False
-                
+            record.fecha_fin = (
+                record.fecha_ini + timedelta(days=record.duracion)
+                if record.fecha_ini and record.duracion else False
+            )
