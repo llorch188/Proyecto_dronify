@@ -1,0 +1,8 @@
+Proyecto_dronify
+Memoria y recopilación del avance del proyecto de Dronify.
+
+- Sesion 3/02 
+  He analizado el proyecto y desarrollado el diagrama Entidad Relación en base a los modelos propuestos.
+
+- Sesion 6/02 
+  Creación de la aplicación en odoo y darle permisos para evitar problemas de los mismos. Creacion de todos los modelos del proyecto en base a las especificaciones descritas.
