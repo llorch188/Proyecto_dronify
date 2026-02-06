@@ -1,13 +1,15 @@
 {
-    'name': "gestion_tareas_Jorge",
+    'name': "dronify",
 
     'summary': "Short (1 phrase/line) summary of the module's purpose",
 
     'description': """
-Long description of module's purpose
+      Dronify es una empresa tecnológica puntera especializada en la logística aeroespacial automatizada. 
+      Su modelo de negocio se centra en revolucionar el transporte de mercancías mediante el uso de una flota de drones inteligentes, 
+      permitiendo realizar entregas rápidas y seguras en entornos donde el transporte terrestre es ineficiente.  
     """,
 
-    'author': "My Company",
+    'author': "Jorge Esplugues Mañó",
     'website': "https://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
@@ -21,7 +23,7 @@ Long description of module's purpose
 
     # always loaded
     'data': [
-        #'security/ir.model.access.csv',
+        # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
     ],
