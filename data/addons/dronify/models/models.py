@@ -100,16 +100,95 @@ class paquetes(models.Model):
                 raise UserError("El nombre del paquete es obligatorio")
             if not vals.get('peso'):
                 raise UserError("El peso del paquete es obligatorio")
-        return super().create(vals_list)
-    
-    # Generar el codigo del paquete en base a la fecha
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
+            # Generar el codigo del paquete en base a la fecha
             if not vals.get('codigo'):
                 vals['codigo'] = datetime.now().strftime('%Y%m%d%H%M%S')
         return super().create(vals_list)
-    
+        
 # ----------------------------------------------------------------------------------------------------------------------------
 
 # MODELO VUELOS
+class vuelos(models.Model):
+    _name = 'dronify.vuelos'
+    _description = 'Vuelos'
+
+    codigo = fields.Char( # Generado automaticamente formato: YYYYMMDDHHMMSS. Solo lectura
+    string="Código",
+    readonly=True,
+    copy=False
+    ) 
+    name = fields.Char( # Obligatorio y valor por defecto: YYYYMMDD_Vuelo
+        string="Nombre",
+        copy=False
+    ) 
+
+    # Relacion many 2 one del dron asignado, obligatorio
+    dron_id = fields.Many2one(
+        'dronify.drones', # Modelo destino de la relacion
+        string='Dron asignado', # Etiqueta en la interfaz
+        ondelete='set null', # Si elimina el vuelo se queda en null(no borra el dron)
+        help='Id del dron que se ha asignado al dron' # Texto de ayuda
+    )
+
+    # Relacion many 2 one con el piloto
+    piloto_id = fields.Many2one( # Obligatorio solo para los pilotos (Preguntar)
+        'dronify.pilotos',
+        string='Piloto asignado al vuelo.',
+        ondelete='set null',
+        help='Id del piloto asignado al vuelo.'
+    )
+    
+    # Relacion one 2 many con los id de los paquetes a transportar
+    paquetes_ids = fields.One2many(
+    'dronify.paquetes', 
+    'vuelo_id', 
+    string='Paquetes del vuelo')
+
+    preparado = fields.Boolean()
+    realizado = fields.Boolean()
+    peso_total = fields.Float( # Campo computado (Sumad el peso de todos los paquetes)
+        string="Peso total",
+        compute="_compute_peso_total",
+        store=True
+    )
+    consumo_estimado = fields.Float( # Campo computado (aproximacion de consumo del vuelo)
+        consumo_estimado = fields.Float(
+        string="Consumo estimado (%)",
+        compute="_compute_consumo_estimado",
+        store=True
+        )
+    )
+
+    @api.model_create_multi # Campo capacidad_max obligatorio
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('name'):
+                raise UserError("El nombre del paquete es obligatorio")
+            if not vals.get('dron_id'):
+                raise UserError("Debe asignar un dron.")
+            if not vals.get('piloto_id'):
+                raise UserError("Debe asignar un piloto.")
+            # Generar el codigo del vuelo en base a la fecha
+            if not vals.get('codigo'):
+                vals['codigo'] = datetime.now().strftime('%Y%m%d%H%M%S_Vuelo')
+        return super().create(vals_list)
+        
+    # Campo computado del peso total 
+    @api.depends('paquetes_ids', 'paquetes_ids.peso')
+    def _compute_peso_total(self):
+        for vuelo in self:
+            total = 0.0
+        for paquete in vuelo.paquetes_ids:
+            total += paquete.peso or 0.0
+        vuelo.peso_total = total
+
+    # Campo computado del consumo estimado
+    @api.depends('peso_total', 'dron_id.capacidad_max')
+    def _compute_consumo_estimado(self):
+        for vuelo in self:
+            if vuelo.dron_id and vuelo.dron_id.capacidad_max:
+                vuelo.consumo_estimado = (
+                vuelo.peso_total / vuelo.dron_id.capacidad_max
+            ) * 100
+        else:
+            vuelo.consumo_estimado = 0
