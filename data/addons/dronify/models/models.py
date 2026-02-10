@@ -132,7 +132,7 @@ class vuelos(models.Model):
 
     # Relacion many 2 one con el piloto
     piloto_id = fields.Many2one( # Obligatorio solo para los pilotos (Preguntar)
-        'dronify.pilotos',
+        'dronify.contactos',
         string='Piloto asignado al vuelo.',
         ondelete='set null',
         help='Id del piloto asignado al vuelo.'
@@ -141,7 +141,7 @@ class vuelos(models.Model):
     # Relacion one 2 many con los id de los paquetes a transportar
     paquetes_ids = fields.One2many(
     'dronify.paquetes', 
-    'vuelo_id', 
+    'codigo', 
     string='Paquetes del vuelo')
 
     preparado = fields.Boolean()
