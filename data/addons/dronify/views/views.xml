@@ -1,60 +1,58 @@
 <odoo>
   <data>
-    <!-- explicit list view definition -->
-<!--
+
+    <!-- CLIENTES -->
     <record model="ir.ui.view" id="dronify.list">
-      <field name="name">dronify list</field>
-      <field name="model">dronify.dronify</field>
+      <field name="name">Vuelos Dronify</field>
+      <field name="model">dronify.vuelos</field>
       <field name="arch" type="xml">
         <list>
+          <field name="codigo"/>
           <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
+          <field name="dron_id"/>
+          <field name="piloto_id"/>
+          <field name="peso_total"/>
+          <field name="consumo_estimado"/>
+          <field name="preparado"/>
+          <field name="realizado"/>
         </list>
       </field>
     </record>
--->
 
-    <!-- actions opening views on models -->
-<!--
-    <record model="ir.actions.act_window" id="dronify.action_window">
-      <field name="name">dronify window</field>
-      <field name="res_model">dronify.dronify</field>
-      <field name="view_mode">list,form</field>
-    </record>
--->
+    <!-- VUELOS -->
 
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="dronify.action_server">
-      <field name="name">dronify server</field>
-      <field name="model_id" ref="model_dronify_dronify"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "list,form",
-          "res_model": model._name,
-        }
+    <record model="ir.ui.view" id="dronify.list">
+      <field name="name">Vuelos Dronify</field>
+      <field name="model">dronify.vuelos</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="codigo"/>
+          <field name="name"/>
+          <field name="dron_id"/>
+          <field name="piloto_id"/>
+          <field name="peso_total"/>
+          <field name="consumo_estimado"/>
+          <field name="preparado"/>
+          <field name="realizado"/>
+        </list>
       </field>
     </record>
--->
 
-    <!-- Top menu item -->
-<!--
+
+    <record model="ir.actions.act_window" id="dronify.action_window">
+      <field name="name">Dronify Jorge</field>
+      <field name="res_model">dronify.vuelos</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
     <menuitem name="dronify" id="dronify.menu_root"/>
--->
-    <!-- menu categories -->
-<!--
+
+
     <menuitem name="Menu 1" id="dronify.menu_1" parent="dronify.menu_root"/>
     <menuitem name="Menu 2" id="dronify.menu_2" parent="dronify.menu_root"/>
--->
-    <!-- actions -->
-<!--
+
     <menuitem name="List" id="dronify.menu_1_list" parent="dronify.menu_1"
               action="dronify.action_window"/>
-    <menuitem name="Server to list" id="dronify" parent="dronify.menu_2"
-              action="dronify.action_server"/>
--->
+
   </data>
 </odoo>
