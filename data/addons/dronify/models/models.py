@@ -139,7 +139,7 @@ class vuelos(models.Model):
     )
     
     # Relacion one 2 many con los id de los paquetes a transportar
-    paquetes_ids = fields.One2many(
+    paquete_ids = fields.One2many(
     'dronify.paquetes', 
     'codigo', 
     string='Paquetes del vuelo')
@@ -159,11 +159,21 @@ class vuelos(models.Model):
         )
     )
 
+    # Metodos de los botones
+    def action_preparar_vuelo(self):
+        self.preparado = True
+
+    def action_desbloquear(self):
+        self.preparado = False
+
+    def action_finalizar_vuelo(self):
+        self.realizado = True
+    
     @api.model_create_multi # Campo capacidad_max obligatorio
     def create(self, vals_list):
         for vals in vals_list:
             if not vals.get('name'):
-                raise UserError("El nombre del paquete es obligatorio")
+                raise UserError("El nombre del vuelo es obligatorio")
             if not vals.get('dron_id'):
                 raise UserError("Debe asignar un dron.")
             if not vals.get('piloto_id'):
@@ -174,11 +184,11 @@ class vuelos(models.Model):
         return super().create(vals_list)
         
     # Campo computado del peso total 
-    @api.depends('paquetes_ids', 'paquetes_ids.peso')
+    @api.depends('paquete_ids', 'paquete_ids.peso')
     def _compute_peso_total(self):
         for vuelo in self:
             total = 0.0
-        for paquete in vuelo.paquetes_ids:
+        for paquete in vuelo.paquete_ids:
             total += paquete.peso or 0.0
         vuelo.peso_total = total
 

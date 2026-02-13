@@ -13,11 +13,96 @@
           <field name="piloto_id"/>
           <field name="peso_total"/>
           <field name="consumo_estimado" widget="percentage"/>
-          <field name="preparado" widget="boolean_toggle"//>
-          <field name="realizado" widget="boolean_toggle"//>
+          <field name="preparado" widget="boolean_toggle"/>
+          <field name="realizado" widget="boolean_toggle"/>
         </list>
       </field>
     </record>
+<record model="ir.ui.view" id="dronify.form">
+  <field name="name">Vuelos Dronify Form</field>
+  <field name="model">dronify.vuelos</field>
+  <field name="arch" type="xml">
+
+    <form>
+      <header>
+
+        <!-- Preparar -->
+        <button name="action_preparar_vuelo"
+                string="Preparar Vuelo"
+                type="object"
+                class="oe_highlight"
+                invisible="preparado == True"/>
+
+        <!-- Desbloquear -->
+        <button name="action_desbloquear"
+                string="Desbloquear"
+                type="object"
+                invisible="preparado == False"/>
+
+        <!-- Finalizar -->
+        <button name="action_finalizar_vuelo"
+                string="Finalizar Vuelo"
+                type="object"
+                invisible="realizado == True"/>
+
+      </header>
+
+      <sheet>
+
+        <!-- PLANIFICACION -->
+        <group string="Planificación">
+
+          <field name="name"
+                 readonly="preparado == True"/>
+
+          <field name="dron_id"
+                 readonly="preparado == True"/>
+
+          <field name="piloto_id"
+                 readonly="preparado == True"/>
+
+        </group>
+
+        <!-- ESTADO -->
+        <group string="Estado y Control">
+
+          <field name="preparado" readonly="True"/>
+          <field name="realizado" readonly="True"/>
+
+        </group>
+
+        <!-- NOTEBOOK -->
+        <notebook>
+
+          <!-- PAQUETES -->
+          <page string="Paquetes">
+
+            <field name="paquete_ids" readonly="preparado == True">
+              <list editable="bottom">
+                <field name="codigo"/>
+                <field name="name"/>
+                <field name="peso"/>
+                <field name="cliente_id"/>
+                <field name="dron_relacionado"/>
+              </list>
+
+            </field>
+
+            <!-- Totales -->
+            <group col="2">
+              <field name="peso_total" readonly="1"/>
+              <field name="consumo_estimado" widget="percentage" readonly="1"/>
+            </group>
+
+          </page>
+
+        </notebook>
+
+      </sheet>
+    </form>
+
+  </field>
+</record>
 
     <record model="ir.actions.act_window" id="dronify.action_window">
       <field name="name">Vuelos</field>
@@ -25,14 +110,13 @@
       <field name="view_mode">list,form</field>
     </record>
     
-        <!-- MENU ROOT -->
+    <!-- MENU ROOT -->
     <menuitem name="Dronify" id="menu_dronify_root"/>
 
     <!-- SUBMENU -->
-    <menuitem name="Vuelos"
-      id="menu_dronify_vuelos"
-      parent="menu_dronify_root"
-      ="dronify.action_window"/>
+    <menuitem name="Vuelos" id="menu_dronify_vuelos"
+    parent="menu_dronify_root"
+    action="dronify.action_window"/>
 
 <!-- CLIENTES -->          
   </data>
