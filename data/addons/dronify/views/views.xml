@@ -2,7 +2,7 @@
   <data>
     <!-- VUELOS -->
 
-    <record model="ir.ui.view" id="dronify.list">
+    <record model="ir.ui.view" id="dronify.vuelos_list">
       <field name="name">Vuelos Dronify</field>
       <field name="model">dronify.vuelos</field>
       <field name="arch" type="xml">
@@ -18,7 +18,7 @@
         </list>
       </field>
     </record>
-<record model="ir.ui.view" id="dronify.form">
+<record model="ir.ui.view" id="dronify.vuelos_form">
   <field name="name">Vuelos Dronify Form</field>
   <field name="model">dronify.vuelos</field>
   <field name="arch" type="xml">
@@ -104,20 +104,47 @@
   </field>
 </record>
 
-    <record model="ir.actions.act_window" id="dronify.action_window">
+    <record model="ir.actions.act_window" id="dronify.action_window_vuelos">
       <field name="name">Vuelos</field>
       <field name="res_model">dronify.vuelos</field>
       <field name="view_mode">list,form</field>
+    </record>
+
+<!-- DRONES -->
+    <record model="ir.ui.view" id="dronify.drones_list">
+      <field name="name">Drones Dronify</field>
+      <field name="model">dronify.drones</field>
+      <field name="arch" type="xml">
+        <list decoration-danger="bateria &lt;= 10">
+          <field name="name"/>
+          <field name="capacidad_max"/>
+          <field name="bateria" widget="progressbar"/>
+          <field name="estado"
+            widget="badge"
+            decoration-success="estado == 'disponible'"
+            decoration-warning="estado == 'vuelo'"
+            decoration-danger="estado == 'taller'"/>
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="dronify.action_window_drones">
+      <field name="name">Drones</field>
+      <field name="res_model">dronify.drones</field>
+      <field name="view_mode">list</field>
     </record>
     
     <!-- MENU ROOT -->
     <menuitem name="Dronify" id="menu_dronify_root"/>
 
-    <!-- SUBMENU -->
+    <!-- SUBMENU Vuelos-->
     <menuitem name="Vuelos" id="menu_dronify_vuelos"
     parent="menu_dronify_root"
-    action="dronify.action_window"/>
+    action="dronify.action_window_vuelos"/>
 
-<!-- CLIENTES -->          
+        <!-- SUBMENU Drones-->
+    <menuitem name="Drones" id="menu_dronify_drones"
+    parent="menu_dronify_root"
+    action="dronify.action_window_drones"/>
   </data>
 </odoo>
