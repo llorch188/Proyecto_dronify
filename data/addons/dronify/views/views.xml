@@ -133,7 +133,34 @@
       <field name="res_model">dronify.drones</field>
       <field name="view_mode">list</field>
     </record>
-    
+
+<!-- PAQUETES -->
+      <record model="ir.ui.view" id="dronify.paquetes_list">
+      <field name="name">Paquetes Dronify</field>
+      <field name="model">dronify.paquetes</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="codigo"/>
+          <field name="name"/>
+          <field name="peso"/>
+          <field name="cliente_id"/>
+          <field name="vuelo_id"/>
+          <field name="dron_relacionado"/>
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="dronify.action_window_paquetes">
+      <field name="name">Paquetes</field>
+      <field name="res_model">dronify.paquetes</field>
+      <field name="view_mode">list</field>
+    </record>
+
+<!-- PILOTOS -->
+
+
+
+
     <!-- MENU ROOT -->
     <menuitem name="Dronify" id="menu_dronify_root"/>
 
@@ -146,5 +173,10 @@
     <menuitem name="Drones" id="menu_dronify_drones"
     parent="menu_dronify_root"
     action="dronify.action_window_drones"/>
+
+    <!-- SUBMENU Paquetes-->
+    <menuitem name="Paquetes" id="menu_dronify_paquetes"
+    parent="menu_dronify_root"
+    action="dronify.action_window_paquetes"/>
   </data>
 </odoo>

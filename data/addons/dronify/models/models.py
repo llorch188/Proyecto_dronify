@@ -91,7 +91,13 @@ class paquetes(models.Model):
         ondelete='set null',
         help='Id del vuelo en el cual se ha asignado el paquete.'
     )
-    dron_relacionado = fields.Char() # Nombre del dron del vuelo (related solo lectura)
+
+    # Nombre del dron del vuelo (related solo lectura)
+    dron_relacionado = fields.Char(  
+        related='vuelo_id.dron_id.name', # Indicar de donde viene este campo(en este caso viene del nombre del dron) 
+        string='Dron',
+        readonly=True
+    )
 
     @api.model_create_multi # Campo capacidad_max obligatorio
     def create(self, vals_list):
