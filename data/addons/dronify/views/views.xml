@@ -156,8 +156,19 @@
       <field name="view_mode">list</field>
     </record>
 
-<!-- PILOTOS -->
-
+<!-- CLIENTES -->
+    <record model="ir.actions.act_window.view" id="action_window_clientes">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="base.view_partner_tree"/>
+        <field name="act_window_id" ref="action_window_clientes"/>
+    </record>
+    <record model="ir.actions.act_window.view" id="action_window_clientes_form">
+      <field name="sequence" eval="2"></field>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="base.view_partner_form"></field>
+      <field name="act_window_id" ref="action_window_clientes_form"></field>
+    </record>
 
 
 
@@ -178,5 +189,12 @@
     <menuitem name="Paquetes" id="menu_dronify_paquetes"
     parent="menu_dronify_root"
     action="dronify.action_window_paquetes"/>
+
+    <!-- SUBMENU Clientes -->
+    <menuitem name="Clientes" id="menu_dronify_clientes" 
+    action="dronify.action_window_clientes"
+    parent="menu_dronify_root" 
+    sequence="50"/>
+
   </data>
 </odoo>

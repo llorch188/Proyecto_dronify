@@ -3,13 +3,19 @@ from odoo.exceptions import UserError
 from datetime import datetime
 
 
-# MODELO CONTACTOS
-class contactos(models.Model):
-    _name = 'dronify.contactos'
-    _description = 'Contactos'
+# MODELO CLIENTE
+class clientes(models.Model):
+    _name = 'res.partner'
+    _inherit = 'res.partner'
 
     es_cliente = fields.Boolean()
     es_vip = fields.Boolean() # Activa el modo ahorro en vuelos
+
+# MODELO PILOTO
+class pilotos(models.Model):
+    _name = 'res.partner'
+    _inherit = 'res.partner'
+
     es_piloto = fields.Boolean()
     licencia = fields.Char() # Obligatorio si es_piloto == True
     # Relacion many 2 many con los drones
@@ -48,7 +54,7 @@ class drones(models.Model):
     )
     # Relacion many 2 many con los drones
     piloto_autorizado_ids = fields.Many2many(
-        comodel_name='dronify.contactos',
+        comodel_name='res.partner',
         relation='relacion_pilotos_drones',
         column1='rel_contactos',
         column2='rel_drones',
@@ -78,7 +84,7 @@ class paquetes(models.Model):
 
     # Relacion many 2 one con el cliente
     cliente_id = fields.Many2one(
-        'dronify.contactos', # Modelo destino de la relacion
+        'res.partner', # Modelo destino de la relacion
         string='Cliente del paquete', # Etiqueta en la interfaz
         ondelete='set null', # Si se elimina el paquete el campo se queda null(no elimina el cliente)
         help='Id del cliente al que pertenece el paquete' # Texto de ayuda
@@ -138,7 +144,7 @@ class vuelos(models.Model):
 
     # Relacion many 2 one con el piloto
     piloto_id = fields.Many2one( # Obligatorio solo para los pilotos (Preguntar)
-        'dronify.contactos',
+        'res.partner',
         string='Piloto asignado al vuelo.',
         ondelete='set null',
         help='Id del piloto asignado al vuelo.'
