@@ -157,7 +157,35 @@
     </record>
 
 <!-- CLIENTES -->
-    <record model="ir.actions.act_window.view" id="action_window_clientes">
+
+    <record model="ir.actions.act_window" id="action_window_clientes">
+        <field name="name">Clientes</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- FORMULARIO CLIENTES -->
+    <record id="clientes_view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.clientes</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">primary</field> 
+        <field name="arch" type="xml">
+        <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="after">
+              <page name="devs" string="Datos Cliente">
+                  <group>
+                      <group>
+                          <field name="es_cliente"/>
+                          <field name="es_piloto"/>
+                          <field name="es_vip"/>
+                      </group>
+                  </group>
+              </page>
+          </xpath>
+      </field> 
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_window_clientes_list">
         <field name="sequence" eval="1"/>
         <field name="view_mode">list</field>
         <field name="view_id" ref="base.view_partner_tree"/>
@@ -170,7 +198,55 @@
       <field name="act_window_id" ref="action_window_clientes_form"></field>
     </record>
 
+<!-- PILOTOS -->
 
+    <record model="ir.actions.act_window" id="action_window_clientes">
+        <field name="name">Pilotos</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- FORMULARIO PILOTOS -->
+    <record id="pilotos_view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.pilotos</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">primary</field> 
+        <field name="arch" type="xml">
+        <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="after">
+              <page name="devs" string="Datos Piloto">
+                  <group>
+                      <group>
+                          <field name="es_piloto"/>
+                          <field name="licencia"/>
+                          <field name="dron_autorizado" widget="many2many_tags"/>
+                          <field name="es_cliente" "editable=True"/>
+                          <field name="es_vip"
+                                domain="[('es_cliente', '=', True)]"
+                                context="{
+                                        'form_view_ref': 'pilotos_view_partner_form_inherit',
+                                        'default_es_cliente': True
+                                    }"
+                          />
+                      </group>
+                  </group>
+              </page>
+          </xpath>
+      </field> 
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_window_pilotos_list">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="base.view_partner_tree"/>
+        <field name="act_window_id" ref="action_window_pilotos"/>
+    </record>
+    <record model="ir.actions.act_window.view" id="action_window_pilotos_form">
+      <field name="sequence" eval="2"></field>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="base.view_partner_form"></field>
+      <field name="act_window_id" ref="action_window_pilotos_form"></field>
+    </record>
 
     <!-- MENU ROOT -->
     <menuitem name="Dronify" id="menu_dronify_root"/>
@@ -193,6 +269,12 @@
     <!-- SUBMENU Clientes -->
     <menuitem name="Clientes" id="menu_dronify_clientes" 
     action="dronify.action_window_clientes"
+    parent="menu_dronify_root" 
+    sequence="50"/>
+
+        <!-- SUBMENU Pilotos -->
+    <menuitem name="Pilotos" id="menu_dronify_pilotos" 
+    action="dronify.action_window_pilotos"
     parent="menu_dronify_root" 
     sequence="50"/>
 
