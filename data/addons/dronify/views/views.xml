@@ -162,6 +162,7 @@
         <field name="name">Clientes</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">list,form</field>
+        <field name="domain">[('es_cliente', '=', True)]</field>
     </record>
 
     <!-- FORMULARIO CLIENTES -->
@@ -191,19 +192,21 @@
         <field name="view_id" ref="base.view_partner_tree"/>
         <field name="act_window_id" ref="action_window_clientes"/>
     </record>
+    
     <record model="ir.actions.act_window.view" id="action_window_clientes_form">
       <field name="sequence" eval="2"></field>
       <field name="view_mode">form</field>
       <field name="view_id" ref="base.view_partner_form"></field>
-      <field name="act_window_id" ref="action_window_clientes_form"></field>
+      <field name="act_window_id" ref="action_window_clientes"></field>
     </record>
 
 <!-- PILOTOS -->
 
-    <record model="ir.actions.act_window" id="action_window_clientes">
+    <record model="ir.actions.act_window" id="action_window_pilotos">
         <field name="name">Pilotos</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">list,form</field>
+        <field name="domain">[('es_piloto', '=', True)]</field>
     </record>
 
     <!-- FORMULARIO PILOTOS -->
@@ -219,8 +222,8 @@
                       <group>
                           <field name="es_piloto"/>
                           <field name="licencia"/>
-                          <field name="dron_autorizado" widget="many2many_tags"/>
-                          <field name="es_cliente" "editable=True"/>
+                          <field name="dron_autorizado_ids" widget="many2many_tags"/>
+                          <field name="es_cliente" editable="True"/>                          
                           <field name="es_vip"
                                 domain="[('es_cliente', '=', True)]"
                                 context="{
