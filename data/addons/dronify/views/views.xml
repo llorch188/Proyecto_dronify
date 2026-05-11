@@ -225,7 +225,7 @@
                           <field name="dron_autorizado_ids" widget="many2many_tags"/>
                           <field name="es_cliente" editable="True"/>                          
                           <field name="es_vip"
-                                domain="[('es_cliente', '=', True)]"
+                                modifiers="{'invisible': [('es_cliente', '=', False)]}"
                                 context="{
                                         'form_view_ref': 'pilotos_view_partner_form_inherit',
                                         'default_es_cliente': True
@@ -244,11 +244,12 @@
         <field name="view_id" ref="base.view_partner_tree"/>
         <field name="act_window_id" ref="action_window_pilotos"/>
     </record>
+
     <record model="ir.actions.act_window.view" id="action_window_pilotos_form">
       <field name="sequence" eval="2"></field>
       <field name="view_mode">form</field>
       <field name="view_id" ref="base.view_partner_form"></field>
-      <field name="act_window_id" ref="action_window_pilotos_form"></field>
+      <field name="act_window_id" ref="action_window_pilotos"></field>
     </record>
 
     <!-- MENU ROOT -->
