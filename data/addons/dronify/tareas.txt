@@ -1,0 +1,65 @@
+# Resumen del Proyecto Dronify
+
+## 1. Introducción
+Dronify es un módulo Odoo para la gestión de drones, pilotos, clientes, paquetes y vuelos. El proyecto extiende el modelo `res.partner` para gestionar tanto pilotos como clientes.
+
+## 2. Requisitos principales
+- `res.partner` extendido con: `es_cliente`, `es_vip`, `es_piloto`, `licencia`, `dron_autorizado_ids`
+- Modelos: `dronify.drones`, `dronify.paquetes`, `dronify.vuelos`
+- Validaciones de licencia y roles
+- Vistas separadas para Pilotos y Clientes
+- Cálculos de `peso_total` y `consumo_estimado`
+- Botones y flujo de estados para vuelos
+- Uso de `logica_dronify.py`
+- Diagrama E-R
+- README con diario
+- nombre/icono correcto en `__manifest__.py`
+
+## 3. Estado actual implementado
+- [x] `res.partner` ampliado con los campos solicitados
+- [x] `dronify.drones` creado
+- [x] `dronify.paquetes` creado
+- [x] `dronify.vuelos` creado
+- [x] Vistas de lista/form de Vuelos, Drones, Paquetes
+- [x] Vistas de Clientes y Pilotos con filtros
+- [x] Campos `function`, `website`, `internal_notes` ocultos
+- [x] Página de datos adicional agregada en formularios
+
+## 4. Problemas detectados
+- [x] `create()` de pilotos ya no forza `es_piloto=True` para todos
+- [x] `licencia` sigue sin constraint en edición
+- [x] `paquete_ids` en vuelos apunta a `codigo` en vez de `vuelo_id`
+- [x] `consumo_estimado` mal definido
+- [x] `logica_dronify.py` no usado
+- [ ] Validaciones de vuelo incompletas
+- [ ] Acciones de menú no establecen `default_es_cliente`
+- [ ] No hay modelo de zonas de riesgo
+- [ ] División de la herencia de `res.partner` en dos clases (`clientes` y `pilotos`) es incorrecta: debe heredar `res.partner` solo una vez y sumar campos ahí.
+
+## 5. Tareas pendientes
+- [x] Añadir constraint para `licencia` (`@api.constrains('es_piloto', 'licencia')`)
+- [x] Corregir relación `paquete_ids` en `dronify.vuelos` a `inverse_name='vuelo_id'`
+- [x] Corregir definición de `consumo_estimado` y calcularlo con `logica_dronify.py`
+- [ ] Implementar validaciones completas en:
+  - `action_preparar_vuelo`
+  - `action_desbloquear`
+  - `action_finalizar_vuelo`
+- [ ] Ajustar vistas de Pilotos/Clientes para:
+  - ocultar datos de piloto en Clientes cuando no corresponde
+  - hacer readonly `es_piloto` en Pilotos y `es_cliente` en Clientes
+- [ ] Establecer `default_es_cliente: True` en la acción Clientes
+- [ ] Aplicar dominio correcto en `cliente_id` de `dronify.paquetes`
+- [ ] Revisar y validar la relación bidireccional Many2many de pilotos/drones
+- [ ] Crear el modelo de zonas de riesgo si se va a implementar la ampliación
+- [ ] Completar diagrama E-R
+- [ ] Escribir README con diario
+- [ ] Verificar `__manifest__.py` (nombre e icono)
+
+## 6. Notas
+- El menú Pilotos debe incluir `context`: `{'default_es_piloto': True}`
+- El menú Clientes debe incluir `context`: `{'default_es_cliente': True}`
+- `es_vip` visible solo si `es_cliente=True`
+- `licencia` visible solo si `es_piloto=True`
+
+## 7. Referencias
+- Enlace de requisitos: https://apuntes-sergio.github.io/sge/8_2026_proyecto_odoo/

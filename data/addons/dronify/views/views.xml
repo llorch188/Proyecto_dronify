@@ -22,61 +22,46 @@
   <field name="name">Vuelos Dronify Form</field>
   <field name="model">dronify.vuelos</field>
   <field name="arch" type="xml">
-
     <form>
       <header>
-
-        <!-- Preparar -->
         <button name="action_preparar_vuelo"
                 string="Preparar Vuelo"
                 type="object"
                 class="oe_highlight"
                 invisible="preparado == True"/>
-
-        <!-- Desbloquear -->
         <button name="action_desbloquear"
                 string="Desbloquear"
                 type="object"
                 invisible="preparado == False"/>
-
-        <!-- Finalizar -->
         <button name="action_finalizar_vuelo"
                 string="Finalizar Vuelo"
                 type="object"
                 invisible="realizado == True"/>
-
       </header>
 
       <sheet>
+        <!-- PARÁMETROS DE VUELO -->
+        <group string="Parámetros de vuelo">
+          <field name="distancia_total"/>
+          <field name="nivel_riesgo"/>
+        </group>
 
-        <!-- PLANIFICACION -->
+        <!-- PLANIFICACIÓN -->
         <group string="Planificación">
-
-          <field name="name"
-                 readonly="preparado == True"/>
-
-          <field name="dron_id"
-                 readonly="preparado == True"/>
-
-          <field name="piloto_id"
-                 readonly="preparado == True"/>
-
+          <field name="name" readonly="preparado == True"/>
+          <field name="dron_id" readonly="preparado == True"/>
+          <field name="piloto_id" readonly="preparado == True"/>
         </group>
 
         <!-- ESTADO -->
         <group string="Estado y Control">
-
           <field name="preparado" readonly="True"/>
           <field name="realizado" readonly="True"/>
-
         </group>
 
         <!-- NOTEBOOK -->
         <notebook>
-
-          <!-- PAQUETES -->
           <page string="Paquetes">
-
             <field name="paquete_ids" readonly="preparado == True">
               <list editable="bottom">
                 <field name="codigo"/>
@@ -85,22 +70,15 @@
                 <field name="cliente_id"/>
                 <field name="dron_relacionado"/>
               </list>
-
             </field>
-
-            <!-- Totales -->
             <group col="2">
               <field name="peso_total" readonly="1"/>
-              <field name="consumo_estimado" widget="percentage" readonly="1"/>
+              <field name="consumo_estimado" readonly="1"/>
             </group>
-
           </page>
-
         </notebook>
-
       </sheet>
     </form>
-
   </field>
 </record>
 
@@ -165,26 +143,47 @@
         <field name="domain">[('es_cliente', '=', True)]</field>
     </record>
 
-    <!-- FORMULARIO CLIENTES -->
-    <record id="clientes_view_partner_form_inherit" model="ir.ui.view">
-        <field name="name">res.partner.form.inherit.clientes</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="mode">primary</field> 
-        <field name="arch" type="xml">
-        <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="after">
-              <page name="devs" string="Datos Cliente">
-                  <group>
-                      <group>
-                          <field name="es_cliente"/>
-                          <field name="es_piloto"/>
-                          <field name="es_vip"/>
-                      </group>
-                  </group>
-              </page>
-          </xpath>
-      </field> 
-    </record>
+<!-- FORMULARIO CLIENTES (herencia) -->
+<record id="clientes_view_partner_form_inherit" model="ir.ui.view">
+  <field name="name">res.partner.form.inherit.clientes</field>
+  <field name="model">res.partner</field>
+  <field name="inherit_id" ref="base.view_partner_form"/>
+  <field name="mode">extension</field>
+  <field name="arch" type="xml">
+    <!-- ocultar pestaña internal_notes -->
+    <xpath expr="//page[@name='internal_notes']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+
+    <!-- ocultar pestañas/campos si existen (ajusta los names si tu vista base es diferente) -->
+    <xpath expr="//page[@name='sales_purchases']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+    <xpath expr="//page[@name='contact_addresses']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+    <xpath expr="//field[@name='function']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+    <xpath expr="//field[@name='website']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+
+    <!-- insertar página Datos Cliente -->
+    <xpath expr="//sheet/notebook" position="inside">
+        <page name="client_data" string="Datos Cliente">
+            <group>
+              <group>
+                <field name="es_cliente"/>
+                <field name="es_vip" invisible="not es_cliente"/>
+                <field name="es_piloto"/>
+                <field name="licencia" invisible="not es_piloto"/>
+              </group>
+            </group>
+        </page>
+    </xpath>
+  </field>
+</record>
 
     <record model="ir.actions.act_window.view" id="action_window_clientes_list">
         <field name="sequence" eval="1"/>
@@ -201,56 +200,75 @@
     </record>
 
 <!-- PILOTOS -->
+<record model="ir.actions.act_window" id="action_window_pilotos">
+    <field name="name">Pilotos</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('es_piloto', '=', True)]</field>
+    <field name="context">{'default_es_piloto': True}</field>
+</record>
 
-    <record model="ir.actions.act_window" id="action_window_pilotos">
-        <field name="name">Pilotos</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('es_piloto', '=', True)]</field>
-    </record>
+<!-- FORMULARIO PILOTOS -->
+<record id="pilotos_view_partner_form_inherit" model="ir.ui.view">
+    <field name="name">res.partner.form.inherit.pilotos</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="arch" type="xml">
 
-    <!-- FORMULARIO PILOTOS -->
-    <record id="pilotos_view_partner_form_inherit" model="ir.ui.view">
-        <field name="name">res.partner.form.inherit.pilotos</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="mode">primary</field> 
-        <field name="arch" type="xml">
-        <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="after">
-              <page name="devs" string="Datos Piloto">
-                  <group>
-                      <group>
-                          <field name="es_piloto"/>
-                          <field name="licencia"/>
-                          <field name="dron_autorizado_ids" widget="many2many_tags"/>
-                          <field name="es_cliente" editable="True"/>                          
-                          <field name="es_vip"
-                                modifiers="{'invisible': [('es_cliente', '=', False)]}"
-                                context="{
-                                        'form_view_ref': 'pilotos_view_partner_form_inherit',
-                                        'default_es_cliente': True
-                                    }"
-                          />
-                      </group>
-                  </group>
-              </page>
-          </xpath>
-      </field> 
-    </record>
+        <!-- OCULTAR PESTAÑA "Internal Notes" -->
+        <xpath expr="//page[@name='internal_notes']" position="attributes">
+            <attribute name="invisible">1</attribute>
+        </xpath>
 
-    <record model="ir.actions.act_window.view" id="action_window_pilotos_list">
-        <field name="sequence" eval="1"/>
-        <field name="view_mode">list</field>
-        <field name="view_id" ref="base.view_partner_tree"/>
-        <field name="act_window_id" ref="action_window_pilotos"/>
-    </record>
+        <!-- ocultar campos individuales -->
+        <xpath expr="//field[@name='function']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
 
-    <record model="ir.actions.act_window.view" id="action_window_pilotos_form">
-      <field name="sequence" eval="2"></field>
-      <field name="view_mode">form</field>
-      <field name="view_id" ref="base.view_partner_form"></field>
-      <field name="act_window_id" ref="action_window_pilotos"></field>
-    </record>
+        <xpath expr="//page[@name='sales_purchases']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//page[@name='contact_addresses']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//field[@name='website']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <!-- AGREGAR PÁGINA "Datos Piloto" -->
+        <xpath expr="//sheet/notebook" position="inside">
+            <page name="pilot_data" string="Datos Piloto" invisible="not es_piloto">
+                <group>
+                    <group>
+                        <field name="es_piloto"/>
+                        <field name="licencia" required="es_piloto"/>
+                        <field name="dron_autorizado_ids" widget="many2many_tags"/>
+                        <field name="es_cliente"/>
+                        <field name="es_vip" invisible="not es_cliente"/>
+                    </group>
+                </group>
+            </page>
+        </xpath>
+
+    </field> 
+</record>
+
+<record model="ir.actions.act_window.view" id="action_window_pilotos_list">
+    <field name="sequence" eval="1"/>
+    <field name="view_mode">list</field>
+    <field name="view_id" ref="base.view_partner_tree"/>
+    <field name="act_window_id" ref="action_window_pilotos"/>
+</record>
+
+<record model="ir.actions.act_window.view" id="action_window_pilotos_form">
+    <field name="sequence" eval="2"/>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="base.view_partner_form"/>
+    <field name="act_window_id" ref="action_window_pilotos"/>
+</record>
 
     <!-- MENU ROOT -->
     <menuitem name="Dronify" id="menu_dronify_root"/>

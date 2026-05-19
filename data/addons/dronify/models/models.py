@@ -1,5 +1,6 @@
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from .logica_dronify import calcular_consumo_vuelo
+from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
 
 
@@ -13,7 +14,6 @@ class clientes(models.Model):
 
 # MODELO PILOTO
 class pilotos(models.Model):
-    _name = 'res.partner'
     _inherit = 'res.partner'
 
     es_piloto = fields.Boolean()
@@ -29,10 +29,16 @@ class pilotos(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('es_piloto'):
-                if not vals.get('licencia'):
-                    raise UserError("La licencia es obligatoria si el usuario es piloto.")
+            if vals.get('es_piloto') and not vals.get('licencia'):
+                raise UserError("La licencia es obligatoria si el usuario es piloto.")
         return super().create(vals_list)
+    
+    # Comprobacion incluso si se esta editando un piloto ya creado ._.
+    @api.constrains('es_piloto', 'licencia')
+    def _check_licencia(self):
+        for rec in self:
+            if rec.es_piloto and not rec.licencia:
+                raise ValidationError("La licencia es obligatoria si el usuario es piloto.")
 
 # ----------------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +64,8 @@ class drones(models.Model):
         relation='relacion_pilotos_drones',
         column1='rel_contactos',
         column2='rel_drones',
-        string='Drones'
+        string='Drones',
+        domain=[('es_piloto', '=', True)]  # Mostrar solo pilotos
     )
     @api.model_create_multi # Campo capacidad_max obligatorio
     def create(self, vals_list):
@@ -132,7 +139,20 @@ class vuelos(models.Model):
     name = fields.Char( # Obligatorio y valor por defecto: YYYYMMDD_Vuelo
         string="Nombre",
         copy=False
-    ) 
+    )
+
+    distancia_total = fields.Float(
+        string="Distancia total (km)",
+        default=0.0
+    )
+    nivel_riesgo = fields.Selection(
+        [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')],
+        string="Nivel de riesgo",
+        default='1'
+    )
+
+    def _es_vip_cliente(self):
+        return any(paquete.cliente_id.es_vip for paquete in self.paquete_ids if paquete.cliente_id)
 
     # Relacion many 2 one del dron asignado, obligatorio
     dron_id = fields.Many2one(
@@ -153,7 +173,7 @@ class vuelos(models.Model):
     # Relacion one 2 many con los id de los paquetes a transportar
     paquete_ids = fields.One2many(
     'dronify.paquetes', 
-    'codigo', 
+    'vuelo_id',
     string='Paquetes del vuelo')
 
     preparado = fields.Boolean()
@@ -164,22 +184,47 @@ class vuelos(models.Model):
         store=True
     )
     consumo_estimado = fields.Float( # Campo computado (aproximacion de consumo del vuelo)
-        consumo_estimado = fields.Float(
         string="Consumo estimado (%)",
         compute="_compute_consumo_estimado",
         store=True
-        )
     )
 
     # Metodos de los botones
     def action_preparar_vuelo(self):
-        self.preparado = True
+        for vuelo in self:
+            if not vuelo.paquete_ids:
+                raise UserError("El vuelo debe tener al menos un paquete asignado.")
+            if not vuelo.dron_id:
+                raise UserError("Debe asignar un dron antes de preparar el vuelo.")
+            if not vuelo.piloto_id:
+                raise UserError("Debe asignar un piloto antes de preparar el vuelo.")
+            if vuelo.dron_id.estado != 'disponible':
+                raise UserError("El dron debe estar en estado Disponible para preparar el vuelo.")
+            if vuelo.peso_total > vuelo.dron_id.capacidad_max:
+                raise UserError("El peso total excede la capacidad máxima del dron.")
+            if vuelo.consumo_estimado > vuelo.dron_id.bateria:
+                raise UserError("No hay batería suficiente para el vuelo estimado.")
+            if vuelo.piloto_id not in vuelo.dron_id.piloto_autorizado_ids:
+                raise UserError("El piloto seleccionado no está autorizado para este dron.")
+
+            vuelo.preparado = True
+            vuelo.dron_id.estado = 'vuelo'
 
     def action_desbloquear(self):
-        self.preparado = False
+        for vuelo in self:
+            if vuelo.realizado:
+                raise UserError("No se puede desbloquear un vuelo ya finalizado.")
+            vuelo.preparado = False
 
     def action_finalizar_vuelo(self):
-        self.realizado = True
+        for vuelo in self:
+            if not vuelo.preparado:
+                raise UserError("Solo se puede finalizar un vuelo que esté preparado.")
+            if not vuelo.dron_id:
+                raise UserError("El vuelo no tiene dron asignado.")
+            vuelo.realizado = True
+            vuelo.dron_id.bateria = max(0, vuelo.dron_id.bateria - int(vuelo.consumo_estimado))
+            vuelo.dron_id.estado = 'disponible'
     
     @api.model_create_multi # Campo capacidad_max obligatorio
     def create(self, vals_list):
@@ -200,17 +245,20 @@ class vuelos(models.Model):
     def _compute_peso_total(self):
         for vuelo in self:
             total = 0.0
-        for paquete in vuelo.paquete_ids:
-            total += paquete.peso or 0.0
-        vuelo.peso_total = total
+            for paquete in vuelo.paquete_ids:
+                total += paquete.peso or 0.0
+            vuelo.peso_total = total
 
     # Campo computado del consumo estimado
-    @api.depends('peso_total', 'dron_id.capacidad_max')
+    @api.depends('peso_total', 'distancia_total', 'nivel_riesgo', 'paquete_ids.cliente_id.es_vip', 'dron_id.capacidad_max')
     def _compute_consumo_estimado(self):
         for vuelo in self:
             if vuelo.dron_id and vuelo.dron_id.capacidad_max:
-                vuelo.consumo_estimado = (
-                vuelo.peso_total / vuelo.dron_id.capacidad_max
-            ) * 100
-        else:
-            vuelo.consumo_estimado = 0
+                vuelo.consumo_estimado = calcular_consumo_vuelo(
+                    vuelo.peso_total,
+                    vuelo.distancia_total,
+                    int(vuelo.nivel_riesgo),
+                    any(paquete.cliente_id.es_vip for paquete in vuelo.paquete_ids if paquete.cliente_id)
+                )
+            else:
+                vuelo.consumo_estimado = 0
