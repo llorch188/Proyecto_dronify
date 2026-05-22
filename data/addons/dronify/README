@@ -1,3 +1,4 @@
+
 Proyecto_dronify
 Memoria y recopilación del avance del proyecto de Dronify.
 
@@ -19,3 +20,7 @@ Hice los modelos de cliente y de piloto con el res.partener como base. He modifi
 
 - Sesion 19/05
 Mucho tiempo pero bueno he acabado los modelos de cliente y piloto, con sus respectivas vistas.
+
+- Sesion 22/05
+He reparado algunos errores de las vistas y modelos, como los clientes y pilotos puestos en true por defecto ademas de readonly, solo mostrar estos mismos por ejemplo en paquetes y drones.
+Falta realizar el modelo nuevo y su vista, y revisar la excepcion de que un piloto no puede volar un dron no asignado.
