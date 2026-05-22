@@ -24,7 +24,7 @@ class pilotos(models.Model):
         relation='relacion_pilotos_drones', # Nombr de la tabla intermediaria en la bddd
         column1='rel_drones', # Nombre de la columna intermediaria referenciando al modelo actual
         column2='rel_contactos', # Nombre de la columna que referencia al otro modelo
-        string='Contactos' # Etiqueta en la interfaz
+        string='Drones' # Etiqueta en la interfaz
     )
     @api.model_create_multi
     def create(self, vals_list):
@@ -64,7 +64,7 @@ class drones(models.Model):
         relation='relacion_pilotos_drones',
         column1='rel_contactos',
         column2='rel_drones',
-        string='Drones',
+        string='Pilotos',
         domain=[('es_piloto', '=', True)]  # Mostrar solo pilotos
     )
     @api.model_create_multi # Campo capacidad_max obligatorio
@@ -94,6 +94,7 @@ class paquetes(models.Model):
         'res.partner', # Modelo destino de la relacion
         string='Cliente del paquete', # Etiqueta en la interfaz
         ondelete='set null', # Si se elimina el paquete el campo se queda null(no elimina el cliente)
+        domain=[('es_cliente', '=', True)], # Mostrar solo los que sean clientes
         help='Id del cliente al que pertenece el paquete' # Texto de ayuda
     )
 
@@ -132,9 +133,9 @@ class vuelos(models.Model):
     _description = 'Vuelos'
 
     codigo = fields.Char( # Generado automaticamente formato: YYYYMMDDHHMMSS. Solo lectura
-    string="Código",
-    readonly=True,
-    copy=False
+        string="Código",
+        readonly=True,
+        copy=False
     ) 
     name = fields.Char( # Obligatorio y valor por defecto: YYYYMMDD_Vuelo
         string="Nombre",
@@ -159,7 +160,7 @@ class vuelos(models.Model):
         'dronify.drones', # Modelo destino de la relacion
         string='Dron asignado', # Etiqueta en la interfaz
         ondelete='set null', # Si elimina el vuelo se queda en null(no borra el dron)
-        help='Id del dron que se ha asignado al dron' # Texto de ayuda
+        help='Id del dron que se ha asignado al dron', # Texto de ayuda
     )
 
     # Relacion many 2 one con el piloto
@@ -167,7 +168,8 @@ class vuelos(models.Model):
         'res.partner',
         string='Piloto asignado al vuelo.',
         ondelete='set null',
-        help='Id del piloto asignado al vuelo.'
+        domain=[('es_piloto', '=', True)],
+        help='Id del piloto asignado al vuelo.',
     )
     
     # Relacion one 2 many con los id de los paquetes a transportar
@@ -213,8 +215,14 @@ class vuelos(models.Model):
     def action_desbloquear(self):
         for vuelo in self:
             if vuelo.realizado:
-                raise UserError("No se puede desbloquear un vuelo ya finalizado.")
+                raise UserError(
+                    "No se puede desbloquear un vuelo ya finalizado."
+                )
+
             vuelo.preparado = False
+
+            if vuelo.dron_id:
+                vuelo.dron_id.estado = 'disponible'
 
     def action_finalizar_vuelo(self):
         for vuelo in self:

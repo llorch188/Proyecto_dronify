@@ -39,7 +39,7 @@ services:
     container_name: postgres_dev_Jorge
     # Permitiendo acceder a la base de datos desde el host
     ports:
-      - 5432:5432
+      - 5433:5433
     # Definimos variables de entorno de PostgreSQL
     environment:
       - POSTGRES_PASSWORD=odoo

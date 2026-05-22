@@ -62,14 +62,18 @@
         <!-- NOTEBOOK -->
         <notebook>
           <page string="Paquetes">
-            <field name="paquete_ids" readonly="preparado == True">
-              <list editable="bottom">
-                <field name="codigo"/>
-                <field name="name"/>
-                <field name="peso"/>
-                <field name="cliente_id"/>
-                <field name="dron_relacionado"/>
-              </list>
+            <field name="paquete_ids"
+                  readonly="preparado == True"
+                  domain="[('vuelo_id', '=', False)]">
+
+                <list>
+                    <field name="codigo"/>
+                    <field name="name"/>
+                    <field name="peso"/>
+                    <field name="cliente_id"/>
+                    <field name="dron_relacionado"/>
+                </list>
+
             </field>
             <group col="2">
               <field name="peso_total" readonly="1"/>
@@ -89,6 +93,14 @@
     </record>
 
 <!-- DRONES -->
+    
+    <record model="ir.actions.act_window" id="dronify.action_window_drones">
+      <field name="name">Drones</field>
+      <field name="res_model">dronify.drones</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- LISTA DRONES -->
     <record model="ir.ui.view" id="dronify.drones_list">
       <field name="name">Drones Dronify</field>
       <field name="model">dronify.drones</field>
@@ -106,10 +118,32 @@
       </field>
     </record>
 
-    <record model="ir.actions.act_window" id="dronify.action_window_drones">
-      <field name="name">Drones</field>
-      <field name="res_model">dronify.drones</field>
-      <field name="view_mode">list</field>
+    <!-- FORMULARIO DRONES -->
+    <record model="ir.ui.view" id="dronify.drones_form">
+        <field name="name">Drones Dronify Form</field>
+        <field name="model">dronify.drones</field>
+        
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+
+                    <group string="Datos del dron">
+                        <field name="name"/>
+                        <field name="capacidad_max"/>
+                        <field name="bateria" widget="progressbar"/>
+                        <field name="estado"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Pilotos autorizados">
+                            <field name="piloto_autorizado_ids"
+                                  widget="many2many_tags"/>
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
     </record>
 
 <!-- PAQUETES -->
@@ -141,6 +175,7 @@
         <field name="res_model">res.partner</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('es_cliente', '=', True)]</field>
+        <field name="context">{'default_es_cliente': True}</field>  <!-- AÑADE ESTO -->
     </record>
 
 <!-- FORMULARIO CLIENTES (herencia) -->
@@ -171,10 +206,10 @@
 
     <!-- insertar página Datos Cliente -->
     <xpath expr="//sheet/notebook" position="inside">
-        <page name="client_data" string="Datos Cliente">
+        <page name="client_data" string="Datos Cliente" invisible="not es_cliente">
             <group>
               <group>
-                <field name="es_cliente"/>
+                <field name="es_cliente" readonly="1"/>
                 <field name="es_vip" invisible="not es_cliente"/>
                 <field name="es_piloto"/>
                 <field name="licencia" invisible="not es_piloto"/>
@@ -243,7 +278,7 @@
             <page name="pilot_data" string="Datos Piloto" invisible="not es_piloto">
                 <group>
                     <group>
-                        <field name="es_piloto"/>
+                        <field name="es_piloto" readonly="1"/>
                         <field name="licencia" required="es_piloto"/>
                         <field name="dron_autorizado_ids" widget="many2many_tags"/>
                         <field name="es_cliente"/>

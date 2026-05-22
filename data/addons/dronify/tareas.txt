@@ -32,7 +32,7 @@ Dronify es un módulo Odoo para la gestión de drones, pilotos, clientes, paquet
 - [x] `consumo_estimado` mal definido
 - [x] `logica_dronify.py` no usado
 - [ ] Validaciones de vuelo incompletas
-- [ ] Acciones de menú no establecen `default_es_cliente`
+- [x] Acciones de menú no establecen `default_es_cliente`
 - [ ] No hay modelo de zonas de riesgo
 - [ ] División de la herencia de `res.partner` en dos clases (`clientes` y `pilotos`) es incorrecta: debe heredar `res.partner` solo una vez y sumar campos ahí.
 
@@ -40,15 +40,15 @@ Dronify es un módulo Odoo para la gestión de drones, pilotos, clientes, paquet
 - [x] Añadir constraint para `licencia` (`@api.constrains('es_piloto', 'licencia')`)
 - [x] Corregir relación `paquete_ids` en `dronify.vuelos` a `inverse_name='vuelo_id'`
 - [x] Corregir definición de `consumo_estimado` y calcularlo con `logica_dronify.py`
-- [ ] Implementar validaciones completas en:
+- [x] Implementar validaciones completas en:
   - `action_preparar_vuelo`
   - `action_desbloquear`
   - `action_finalizar_vuelo`
 - [ ] Ajustar vistas de Pilotos/Clientes para:
   - ocultar datos de piloto en Clientes cuando no corresponde
   - hacer readonly `es_piloto` en Pilotos y `es_cliente` en Clientes
-- [ ] Establecer `default_es_cliente: True` en la acción Clientes
-- [ ] Aplicar dominio correcto en `cliente_id` de `dronify.paquetes`
+- [x] Establecer `default_es_cliente: True` en la acción Clientes
+- [x] Aplicar dominio correcto en `cliente_id` de `dronify.paquetes`
 - [ ] Revisar y validar la relación bidireccional Many2many de pilotos/drones
 - [ ] Crear el modelo de zonas de riesgo si se va a implementar la ampliación
 - [ ] Completar diagrama E-R
