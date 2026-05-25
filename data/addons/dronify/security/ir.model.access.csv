@@ -6,4 +6,6 @@ access_dronify_paquetes,dronify.paquetes,model_dronify_paquetes,base.group_user,
 
 access_dronify_vuelos,dronify.vuelos,model_dronify_vuelos,base.group_user,1,1,1,1
 
+access_dronify_zonas,dronify.zonas,model_dronify_zonas,base.group_user,1,1,1,1
+
 

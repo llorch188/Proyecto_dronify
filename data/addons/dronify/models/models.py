@@ -124,7 +124,36 @@ class paquetes(models.Model):
             if not vals.get('codigo'):
                 vals['codigo'] = datetime.now().strftime('%Y%m%d%H%M%S')
         return super().create(vals_list)
-        
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+# MODELO ZONAS
+class zonas(models.Model):
+    _name = 'dronify.zonas'
+    _description = 'Zonas'
+
+    name = fields.Char() # Obligatorio
+    distancia_km = fields.Float()
+    nivel_riesgo = fields.Selection(
+        [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')],
+        string="Nivel de riesgo",
+        default='1'
+    )
+    tarifa_base = fields.Float()
+  
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('name'):
+                raise UserError(
+                    "El nombre de la zona es obligatorio."
+                )
+            if not vals.get('nivel_riesgo'):
+                raise UserError(
+                    "El nivel de riesgo es obligatorio."
+                )
+        return super().create(vals_list)
+    
 # ----------------------------------------------------------------------------------------------------------------------------
 
 # MODELO VUELOS
@@ -171,6 +200,13 @@ class vuelos(models.Model):
         domain=[('es_piloto', '=', True)],
         help='Id del piloto asignado al vuelo.',
     )
+    # Relacion many 2 one con la zona
+    zona_id = fields.Many2one(
+        'dronify.zonas',
+        string='Zona',
+        ondelete='set null',
+        help='Id de la zona asignada al vuelo.',
+    )
     
     # Relacion one 2 many con los id de los paquetes a transportar
     paquete_ids = fields.One2many(
@@ -190,6 +226,20 @@ class vuelos(models.Model):
         compute="_compute_consumo_estimado",
         store=True
     )
+
+    consumo_texto = fields.Char(
+        string='Consumo estimado',
+        compute='_compute_consumo_texto'
+    )
+
+    @api.depends('consumo_estimado')
+    def _compute_consumo_texto(self):
+        for vuelo in self:
+            vuelo.consumo_texto = (
+                f"{vuelo.consumo_estimado}%"
+                if vuelo.consumo_estimado
+                else "0%"
+            )
 
     # Metodos de los botones
     def action_preparar_vuelo(self):
@@ -257,16 +307,30 @@ class vuelos(models.Model):
                 total += paquete.peso or 0.0
             vuelo.peso_total = total
 
-    # Campo computado del consumo estimado
-    @api.depends('peso_total', 'distancia_total', 'nivel_riesgo', 'paquete_ids.cliente_id.es_vip', 'dron_id.capacidad_max')
+    @api.depends('peso_total','zona_id','paquete_ids','paquete_ids.cliente_id','paquete_ids.cliente_id.es_vip'
+    )
     def _compute_consumo_estimado(self):
+
         for vuelo in self:
-            if vuelo.dron_id and vuelo.dron_id.capacidad_max:
-                vuelo.consumo_estimado = calcular_consumo_vuelo(
+
+            # Si no hay zona no calculamos
+            if not vuelo.zona_id:
+                vuelo.consumo_estimado = 0.0
+                continue
+
+            # Verificar si hay algún cliente VIP
+            es_vip = any(
+                paquete.cliente_id.es_vip
+                for paquete in vuelo.paquete_ids
+                if paquete.cliente_id
+            )
+
+            # Calcular consumo usando zona
+            vuelo.consumo_estimado = (
+                calcular_consumo_vuelo(
                     vuelo.peso_total,
-                    vuelo.distancia_total,
-                    int(vuelo.nivel_riesgo),
-                    any(paquete.cliente_id.es_vip for paquete in vuelo.paquete_ids if paquete.cliente_id)
+                    vuelo.zona_id.distancia_km,
+                    int(vuelo.zona_id.nivel_riesgo),
+                    es_vip
                 )
-            else:
-                vuelo.consumo_estimado = 0
+            )

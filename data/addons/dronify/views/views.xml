@@ -11,8 +11,9 @@
           <field name="name"/>
           <field name="dron_id"/>
           <field name="piloto_id"/>
+          <field name="zona_id"/>
           <field name="peso_total"/>
-          <field name="consumo_estimado" widget="percentage"/>
+          <field name="consumo_texto" readonly="1"/>
           <field name="preparado" widget="boolean_toggle"/>
           <field name="realizado" widget="boolean_toggle"/>
         </list>
@@ -41,9 +42,8 @@
 
       <sheet>
         <!-- PARÁMETROS DE VUELO -->
-        <group string="Parámetros de vuelo">
-          <field name="distancia_total"/>
-          <field name="nivel_riesgo"/>
+        <group string="Zona del Vuelo">
+          <field name="zona_id"/>
         </group>
 
         <!-- PLANIFICACIÓN -->
@@ -91,6 +91,69 @@
       <field name="res_model">dronify.vuelos</field>
       <field name="view_mode">list,form</field>
     </record>
+
+<!-- ZONAS -->
+
+<!-- ACCIÓN ZONAS -->
+<record model="ir.actions.act_window" id="dronify.action_window_zonas">
+    <field name="name">Zonas</field>
+    <field name="res_model">dronify.zonas</field>
+    <field name="view_mode">list,form</field>
+</record>
+
+<!-- VISTA LISTA -->
+<record model="ir.ui.view" id="dronify.zonas_list">
+
+    <field name="name">Zonas Dronify List</field>
+    <field name="model">dronify.zonas</field>
+    <field name="arch" type="xml">
+
+        <list
+            decoration-success="nivel_riesgo in ['1','2']"
+            decoration-info="nivel_riesgo == '3'"
+            decoration-warning="nivel_riesgo == '4'"
+            decoration-danger="nivel_riesgo == '5'">
+
+            <field name="name"/>
+            <field name="distancia_km"/>
+            <field name="nivel_riesgo"/>
+            <field name="tarifa_base"/>
+        </list>
+
+    </field>
+</record>
+
+<!-- VISTA FORMULARIO -->
+<record model="ir.ui.view" id="dronify.zonas_form">
+    <field name="name">Zonas Dronify Form</field>
+    <field name="model">dronify.zonas</field>
+    <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group string="Datos de la zona">
+                    <field name="name"/>
+                    <field name="distancia_km"/>
+                    <field name="nivel_riesgo"/>
+                    <field name="tarifa_base"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record model="ir.actions.act_window.view" id="action_window_zonas_list">
+    <field name="sequence" eval="1"/>
+    <field name="view_mode">list</field>
+    <field name="view_id" ref="dronify.zonas_list"/>
+    <field name="act_window_id" ref="dronify.action_window_zonas"/>
+</record>
+
+<record model="ir.actions.act_window.view" id="action_window_zonas_form">
+    <field name="sequence" eval="2"/>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="dronify.zonas_form"/>
+    <field name="act_window_id" ref="dronify.action_window_zonas"/>
+</record>
 
 <!-- DRONES -->
     
@@ -313,7 +376,12 @@
     parent="menu_dronify_root"
     action="dronify.action_window_vuelos"/>
 
-        <!-- SUBMENU Drones-->
+    <!-- SUBMENU ZONAS -->
+    <menuitem name="Zonas" id="menu_dronify_zonas"
+    parent="menu_dronify_root"
+    action="dronify.action_window_zonas"/>
+
+    <!-- SUBMENU Drones-->
     <menuitem name="Drones" id="menu_dronify_drones"
     parent="menu_dronify_root"
     action="dronify.action_window_drones"/>
