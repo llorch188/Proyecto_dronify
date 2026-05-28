@@ -24,3 +24,6 @@ Mucho tiempo pero bueno he acabado los modelos de cliente y piloto, con sus resp
 - Sesion 22/05
 He reparado algunos errores de las vistas y modelos, como los clientes y pilotos puestos en true por defecto ademas de readonly, solo mostrar estos mismos por ejemplo en paquetes y drones.
 Falta realizar el modelo nuevo y su vista, y revisar la excepcion de que un piloto no puede volar un dron no asignado.
+
+-Sesion 25/05
+Realizacion del modulo de zonas y su vista, ademas de conectarlo con vuelo y hacer varias comprobaciones. :)
