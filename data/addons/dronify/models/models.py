@@ -244,6 +244,8 @@ class vuelos(models.Model):
     # Metodos de los botones
     def action_preparar_vuelo(self):
         for vuelo in self:
+            if not vuelo.zona_id:
+                raise UserError("El vuelo debe tener una zona asignada.")
             if not vuelo.paquete_ids:
                 raise UserError("El vuelo debe tener al menos un paquete asignado.")
             if not vuelo.dron_id:
