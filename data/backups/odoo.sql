@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 5LwcHD7EABVQ2ybgWTwPqtzTNNHJC4ivRPd6j2shbNlg1E1ux3TQ5Ltqr0P1OOa
+\restrict Eza398tdncT2Wm2PLEAbJ35AvQ9dLfhzXJFMw4UwxyF4ia8sW6H2T0kXUIDe0W5
 
 -- Dumped from database version 15.15 (Debian 15.15-1.pgdg13+1)
 -- Dumped by pg_dump version 15.15 (Debian 15.15-1.pgdg13+1)
@@ -14466,6 +14466,7 @@ COPY public.dronify_contactos (id, create_uid, write_uid, licencia, es_cliente, 
 
 COPY public.dronify_drones (id, bateria, create_uid, write_uid, name, estado, create_date, write_date, capacidad_max) FROM stdin;
 1	87	2	2	Dron campeon	disponible	2026-05-29 08:56:09.783771	2026-05-29 09:16:01.123648	10
+2	100	2	2	Dron ni grrr	disponible	2026-05-29 09:23:05.172768	2026-05-29 09:23:05.172768	15
 \.
 
 
@@ -14475,6 +14476,7 @@ COPY public.dronify_drones (id, bateria, create_uid, write_uid, name, estado, cr
 
 COPY public.dronify_paquetes (id, cliente_id, vuelo_id, create_uid, write_uid, codigo, name, create_date, write_date, peso) FROM stdin;
 1	7	1	2	2	20260529085643	Paqueton	2026-05-29 08:56:43.854231	2026-05-29 08:56:43.854231	5
+2	7	2	2	2	20260529092356	Paqueton	2026-05-29 09:23:56.545826	2026-05-29 09:24:13.892516	10
 \.
 
 
@@ -14484,6 +14486,7 @@ COPY public.dronify_paquetes (id, cliente_id, vuelo_id, create_uid, write_uid, c
 
 COPY public.dronify_vuelos (id, dron_id, piloto_id, create_uid, write_uid, codigo, name, preparado, realizado, create_date, write_date, peso_total, consumo_estimado, zona_id, nivel_riesgo, distancia_total) FROM stdin;
 1	1	8	2	2	20260529085643_Vuelo	Vuelillo	t	t	2026-05-29 08:56:43.854231	2026-05-29 09:16:01.123648	5	13.37	1	1	0
+2	2	9	2	2	20260529092356_Vuelo	Vuelo chungo	\N	\N	2026-05-29 09:23:56.545826	2026-05-29 09:24:13.892516	10	27.72	2	1	0
 \.
 
 
@@ -31348,7 +31351,8 @@ COPY public.res_partner (id, company_id, create_date, name, parent_id, user_id, 
 1	\N	2025-12-05 09:31:57.423121	JEM Jorge	\N	\N	\N	68	\N	0	1	\N	2	JEM Jorge	\N	es_ES	\N	\N	\N	\N	\N	contact		\N			jorespman2@alu.edu.gva.es		JEM Jorge	\N	\N	\N	\N	\N	\N	t	\N	t	t	2025-12-05 09:36:31.381251	\N	\N	\N	\N
 7	\N	2026-05-29 08:54:43.818499	Cliente prueba	\N	\N	\N	\N	\N	0	7	2	2	Cliente prueba	\N	es_ES	Europe/Madrid	\N	\N	\N	\N	contact	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	t	\N	f	t	2026-05-29 08:54:43.818499	\N	t	t	f
 8	\N	2026-05-29 08:54:56.597338	Piloto prueba	\N	\N	\N	\N	\N	0	8	2	2	Piloto prueba	\N	es_ES	Europe/Madrid	\N	\N	\N	\N	contact	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	t	\N	f	t	2026-05-29 08:54:56.597338	123456	f	f	t
-9	\N	2026-05-29 08:55:07.904205	Todo en uno	\N	\N	\N	\N	\N	0	9	2	2	Todo en uno	\N	es_ES	Europe/Madrid	\N	\N	\N	\N	contact	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	t	\N	f	t	2026-05-29 08:55:07.904205	12345	t	f	t
+10	\N	2026-05-29 09:24:27.026951	Cliente vip	\N	\N	\N	\N	\N	0	10	2	2	Cliente vip	\N	es_ES	Europe/Madrid	\N	\N	\N	\N	contact	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	t	\N	f	t	2026-05-29 09:24:27.026951	\N	t	t	f
+9	\N	2026-05-29 08:55:07.904205	Todo en uno	\N	\N	\N	\N	\N	0	9	2	2	Todo en uno	\N	es_ES	Europe/Madrid	\N	\N	\N	\N	contact	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	t	\N	f	t	2026-05-29 09:25:05.908476	12345	t	f	t
 \.
 
 
@@ -31743,21 +31747,21 @@ SELECT pg_catalog.setval('public.dronify_contactos_id_seq', 1, false);
 -- Name: dronify_drones_id_seq; Type: SEQUENCE SET; Schema: public; Owner: odoo
 --
 
-SELECT pg_catalog.setval('public.dronify_drones_id_seq', 1, true);
+SELECT pg_catalog.setval('public.dronify_drones_id_seq', 2, true);
 
 
 --
 -- Name: dronify_paquetes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: odoo
 --
 
-SELECT pg_catalog.setval('public.dronify_paquetes_id_seq', 1, true);
+SELECT pg_catalog.setval('public.dronify_paquetes_id_seq', 2, true);
 
 
 --
 -- Name: dronify_vuelos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: odoo
 --
 
-SELECT pg_catalog.setval('public.dronify_vuelos_id_seq', 1, true);
+SELECT pg_catalog.setval('public.dronify_vuelos_id_seq', 2, true);
 
 
 --
@@ -32247,7 +32251,7 @@ SELECT pg_catalog.setval('public.res_partner_category_id_seq', 1, false);
 -- Name: res_partner_id_seq; Type: SEQUENCE SET; Schema: public; Owner: odoo
 --
 
-SELECT pg_catalog.setval('public.res_partner_id_seq', 9, true);
+SELECT pg_catalog.setval('public.res_partner_id_seq', 10, true);
 
 
 --
@@ -37857,5 +37861,5 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 5LwcHD7EABVQ2ybgWTwPqtzTNNHJC4ivRPd6j2shbNlg1E1ux3TQ5Ltqr0P1OOa
+\unrestrict Eza398tdncT2Wm2PLEAbJ35AvQ9dLfhzXJFMw4UwxyF4ia8sW6H2T0kXUIDe0W5
 
