@@ -41,11 +41,9 @@
       </header>
 
       <sheet>
-        <!-- PARÁMETROS DE VUELO -->
-        <group string="Zona del Vuelo">
-          <field name="zona_id"/>
-        </group>
 
+
+  <group>
         <!-- PLANIFICACIÓN -->
         <group string="Planificación">
           <field name="name" readonly="preparado == True"/>
@@ -53,12 +51,16 @@
           <field name="piloto_id" readonly="preparado == True"/>
         </group>
 
-        <!-- ESTADO -->
+        <!-- PARÁMETROS DE VUELO -->
+        <group string="Zona del Vuelo">
+          <field name="zona_id"/>
+        </group>
+  </group>
+          <!-- ESTADO -->
         <group string="Estado y Control">
           <field name="preparado" readonly="True"/>
           <field name="realizado" readonly="True"/>
-        </group>
-
+        </group>  
         <!-- NOTEBOOK -->
         <notebook>
           <page string="Paquetes">

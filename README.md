@@ -1,77 +1,29 @@
-# Preparación para entorno de desarrollo
 
-En primer lugar clonar repositorio base de ejemplo y después:
+Proyecto_dronify
+Memoria y recopilación del avance del proyecto de Dronify.
 
-## Cambios en los fichero de configuración
+- Sesion 3/02 
+  He analizado el proyecto y desarrollado el diagrama Entidad Relación en base a los modelos propuestos.
 
-Una vez hecho el clonado **antes de restauar la base de datos** deben efectuarse cambios en los siguientes ficheros:
+- Sesion 6/02 
+  Creación de la aplicación en odoo y darle permisos para evitar problemas de los mismos. Creacion de todos los modelos del proyecto en base a las especificaciones descritas.
+- En casa
+Empezar la vista de vuelos, mostrando los datos indicandos y corrigiendo varios datos del modelo.
 
-- `docker-compose.yml`: Cambiar todas las ocurencias de los nombre de los contenedores
-  - por ejemplo, de `odoo_dev_dam` a `odoo_dev_sergio`
-  - si se mantiene la raiz del nombre, solo reemplazar `dav` por `sergio`
-- `data/odoo_config/odoo.conf`: 
-  - En la línea 19, poner el mismo valor que en el fichero anterior en `postgres_dev_dam`
-- `script/restore.sh` y `script/backup.sh`: actualizar las siguientes variables que se encuentran al principio de los scripts: 
-  ```bash
-  PG_CONTAINER="postgres_dev_dam"   # Nombre del contenedor de Postgres
-  ODOO_CONTAINER="odoo_dev_dam"     # Nombre del contenedor de Odoo
-  PG_USER="odoo"                    # Usuario de la BD Postgres
-  DB_NAME="odoo"                    # Nombre de la BD a respaldar 
-  ```
+- Sesion 13/02
+Vista de vuelos casi acabada pero falta mejorar detalles(Creo)
 
-## Copia y restauración
+---------------------------------------------------------------------------------------------------------------------------------
 
-Una vez se han hecho todos los cambios. 
+-Sesion Recuperacion 31/03
+Hice los modelos de cliente y de piloto con el res.partener como base. He modificado la vista con la lista y formulario del mismo, pero me falta modificar estos.
 
-### Para hacer copia
+- Sesion 19/05
+Mucho tiempo pero bueno he acabado los modelos de cliente y piloto, con sus respectivas vistas.
 
-Para guardar los cambios
+- Sesion 22/05
+He reparado algunos errores de las vistas y modelos, como los clientes y pilotos puestos en true por defecto ademas de readonly, solo mostrar estos mismos por ejemplo en paquetes y drones.
+Falta realizar el modelo nuevo y su vista, y revisar la excepcion de que un piloto no puede volar un dron no asignado.
 
-```bash
-bash scripts/backup.sh
-
-git add .                           # usar sudo si da errores de permisos
-git commit -m "Comentario que sea"
-git push
-```
-
-### para restaurar copia
-
-```bash
-git pull    # si te tienes que descargar desde tu repositorio la última versión.
-
-bash scripts/restore.sh
-```
-
-## fichero `.gitignore`
-
-Se debe preparar el fichero para no copiar en GitHub ficheros innecesarios que hagan la copia más pesada:
-
-```bash
-# ----------------------------------------------------------------
-# IGNORAR TODOS LOS DATOS PERSISTENTES (¡MUY IMPORTANTE!)
-# ----------------------------------------------------------------
-
-# Ignorar los datos de la base de datos PostgreSQL
-/data/dataPostgreSQL/
-
-# Ignorar el filestore de Odoo (adjuntos, imágenes, etc.)
-/data/odoo/filestore/
-
-# Ignorar las sesiones de Odoo
-/data/odoo/sessions/
-
-# ----------------------------------------------------------------
-# Archivos de sistema y Python
-# ----------------------------------------------------------------
-
-# Ignorar archivos compilados de Python
-__pycache__/
-*.pyc
-
-# Ignorar archivos de sistema operativo
-.DS_Store
-
-# Ignorar carpetas de IDEs (opcional pero recomendado)
-.vscode/
-```
+-Sesion 25/05
+Realizacion del modulo de zonas y su vista, ademas de conectarlo con vuelo y hacer varias comprobaciones. :)
